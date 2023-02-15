@@ -16,8 +16,8 @@ class ExpertSystem(QtWidgets.QMainWindow):
         loadUi('ui/main.ui', self)
         self.dbTask = Database()
         self.expertManage.triggered.connect(self.show_expert_manage)
-        # self.tab = TabCompetence("competence", "question_answer")
-        # self.expertMenu.addTab(self.tab, "Оценка")
+        self.tab = TabCompetence("competence", "question_answer")
+        self.expertMenu.addTab(self.tab, "Оценка")
 
     def show_message(self, text: str):
         alertMsg = QtWidgets.QMessageBox(self)

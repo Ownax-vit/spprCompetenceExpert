@@ -46,6 +46,5 @@ class Database:
           """
         self.cur.execute(query, (task_id,))
         res = self.cur.fetchall()
-        print(res)
 
         return res
