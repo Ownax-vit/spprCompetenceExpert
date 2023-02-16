@@ -1,10 +1,15 @@
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtGui import QIcon
+from PyQt6.QtWidgets import QMessageBox
 from PyQt6.uic import loadUi
+
+from .db import Database
+
 
 class ExpertForm(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
+        self.db = Database()
         self.setWindowTitle("Добавление пользователя")
         self.resize(300, 200)
         layout = QtWidgets.QVBoxLayout()
@@ -28,9 +33,15 @@ class ExpertForm(QtWidgets.QWidget):
         self.setLayout(layout)
 
     def add_expert(self):
-        print(self.lineName.text(), self.lineSurname.text())
-        text = "Эксперт успешно добавлен!"
-        self.show_message(text)
+        # решить вылет
+        print("add ex")
+        first_name = self.lineName.text()
+        last_name = self.lineSurname.text()
+        self.db.add_expert(first_name, last_name)
+        print("end ex")
+        # text = "Эксперт успешно добавлен!"
+        # msg = QtWidgets.QMessageBox(text)
+        # msg.show()
 
 
 

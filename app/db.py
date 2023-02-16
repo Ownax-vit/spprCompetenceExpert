@@ -3,7 +3,6 @@ import sqlite3 as db
 from sqlite3 import Error as ErrorDb
 from typing import Optional, Iterable
 
-from .models import Expert
 from .config import Config
 
 
@@ -22,7 +21,7 @@ class Database:
 
     def get_all_requirements(self) -> Optional[list[tuple]]:
         """ Получить все требования для оценки, вкладки"""
-        query = """SELECT requirement_name, name, description, weigth FROM requirements"""
+        query = """SELECT requirement_name, name, description, weight FROM requirements"""
         self.cur.execute(query)
         res = self.cur.fetchall()
         print(res)
@@ -31,7 +30,7 @@ class Database:
     def get_all_tasks_for_requirement(self, requirement_name: str) -> Optional[list[tuple]]:
 
         query = """
-            SELECT task_id, requirement_name, type_task_id, name, description FROM tasks 
+            SELECT task_id, requirement_name, task_type, name, description FROM tasks 
             WHERE requirement_name = ?
         """
 
@@ -40,11 +39,56 @@ class Database:
         print(res)
         return res
 
-    def get_all_answers_for_task(self, task_id: int) -> Optional[list[tuple]]:
+    def get_all_solution_for_task(self, task_id: int) -> Optional[list[tuple]]:
         query = """
-              SELECT answer_id, task_id, mark, text FROM answers WHERE task_id = ?
+              SELECT solution_id, task_id, mark, text, valid_answer FROM solutions WHERE task_id = ?
           """
         self.cur.execute(query, (task_id,))
         res = self.cur.fetchall()
 
         return res
+
+    def get_all_experts(self) -> Optional[list[tuple]]:
+        query = """
+              SELECT expert_id, first_name, last_name FROM experts
+          """
+        self.cur.execute(query)
+        res = self.cur.fetchall()
+
+        return res
+
+    def add_expert(self, f_name: str, l_name: str):
+        query = """
+              INSERT INTO experts (first_name, last_name) VALUES (?, ?)
+          """
+        self.cur.execute(query, (f_name, l_name))
+        self.con.commit()
+
+    def add_answer(self, solution_id: int, expert_id: int, mark: float):
+        query = """
+             INSERT INTO answers (solution_id, expert_id, mark) VALUES (?, ?)
+        """
+
+    def add_mark_requirement(self, expert_id: int, requirement_name: str, mark: float):
+        query = """
+              INSERT INTO mark_requirement (expert_id, requirement_name, mark) VALUES (?, ?, ?)
+
+          """
+        self.cur.execute(query, (expert_id, requirement_name, mark))
+        self.con.commit()
+
+    def get_all_marks_requirements_experts(self):
+        query = """
+              SELECT r.name, r.weight, m_r.expert_id, m_r.mark, e.first_name, e.last_name from requirements r
+              INNER JOIN mark_requirement m_r on r.requirement_name=m_r.requirement_name
+              INNER JOIN experts e on e.id=m_r.expert_id 
+              
+          """
+        self.cur.execute(query)
+        res = self.cur.fetchall()
+
+        return res
+
+
+
+
