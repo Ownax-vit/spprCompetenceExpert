@@ -10,7 +10,7 @@ from PyQt6.QtGui import QIcon
 from PyQt6.uic import loadUi
 
 from .db import Database
-from .utils import transform_mark_requirement_to_dict
+from .utils import transform_mark_requirement_to_dict, get_list_id_experts, get_dict_expert_id_name
 
 
 class Result(QWidget):
@@ -22,16 +22,41 @@ class Result(QWidget):
     def __init__(self):
         super().__init__()
         self.db = Database()
-        # self.dict_marks_requirement = transform_mark_requirement_to_dict(self.db.get_all_marks_requirements_experts())
-        # self.render()
+        self.list_marks_requirement = self.db.get_all_marks_requirements_experts()
+        self.dict_marks_requirement = transform_mark_requirement_to_dict(self.list_marks_requirement)
+
+        self.render()
 
     def render(self):
         """ Рендер вкладки результатов """
         table = QTableWidget(self)
-        print(self.dict_marks_requirement)
+        dict_expert_name_id = get_dict_expert_id_name(self.dict_marks_requirement)
+        vbox_main = QVBoxLayout()
+        list_id_experts_in_dict = sorted(get_list_id_experts(self.dict_marks_requirement))
+        list_name_experts = list(dict_expert_name_id[i] for i in list_id_experts_in_dict)
 
-        table.setRowCount(len(self.dict_marks_requirement.keys()))
-        table.setRowCount(len(self.dict_marks_requirement.keys()))
+        count_rows = len(self.dict_marks_requirement.keys())
+        count_cols = int(len(list_id_experts_in_dict))
+
+        table.setRowCount(count_rows)         # количество компетенций (вкладок)
+        table.setColumnCount(count_cols)      # количество экспертов
+
+        table.setHorizontalHeaderLabels(list_name_experts)
+        table.setVerticalHeaderLabels(list(self.dict_marks_requirement.keys()))
+
+        # Set the table values
+        for i, (competence, data) in enumerate(self.dict_marks_requirement.items()):
+            for j, expert_id in enumerate(list_id_experts_in_dict):
+                expert_data = self.dict_marks_requirement[competence].get(expert_id)
+                if expert_data is None:
+                    mark = 0
+                else:
+                    mark = expert_data.get("mark")
+                table.setItem(i, j, QTableWidgetItem(str(mark)))
+
+
+        vbox_main.addWidget(table)
+        self.setLayout(vbox_main)
 
 
 class Requirement(QWidget):
@@ -44,6 +69,7 @@ class Requirement(QWidget):
         self.name = name                      # наименование вкладки из БД
         self.description = description        # описание вкладки из БД
         self.weight = weight                  # глобальный вес компетенции
+        self.mark_label = QLabel("0")         # текущая оценка компетенции
 
         # словарь типов задач
         self.dict_types_tasks = {"question-variant": self.render_variant,
@@ -67,8 +93,13 @@ class Requirement(QWidget):
             self.vbox.addWidget(task_box)
 
         btn_send = QPushButton("Отправить")     # кнопка подсчета оценки компетенции
+        btn_send.setFixedHeight(40)
+        btn_send.setFixedWidth(150)
         btn_send.clicked.connect(self.calc_tab_mark)
-        self.vbox.addWidget(btn_send)
+        self.vbox.addWidget(btn_send, 5)
+
+        self.vbox.addWidget(QLabel("Текущая оценка: "))
+        self.vbox.addWidget(self.mark_label)
 
         widget_tab.setLayout(self.vbox)
         scroll_area.setWidgetResizable(True)
@@ -97,6 +128,10 @@ class Requirement(QWidget):
 
         for answer in answers:
             radio = QRadioButton(answer[3])     # Кнопка ответа с соответствующим текстом
+            radio.setStyleSheet("QRadioButton"
+                                       "{"
+                                       "spacing : 20px;"
+                                       "}")
             radio.mark = answer[2]              # оценка за данный ответ
             radio.task_id = answer[1]           # ид задачи (вопроса)
             radio.solution_id = answer[0]       # ид ответа
@@ -111,6 +146,10 @@ class Requirement(QWidget):
 
         for answer in answers:
             check = QCheckBox(answer[3])  # текст ответа
+            check.setStyleSheet("QCheckBox"
+                                       "{"
+                                       "spacing : 20px;"
+                                       "}")
             check.mark = answer[2]
             check.task_id = answer[1]
             check.solution_id = answer[0]
@@ -184,9 +223,13 @@ class TabCompetence(Requirement):
             array_mark = np.array(list_answer)
             mark_requirement = round(array_mark.mean(), 2)
             self.db.add_mark_requirement(self.current_expert, self.name, mark_requirement)
+            print(f"Оценка компетенции: {self.name} ", mark_requirement)
+            self.mark_label.setText(str(mark_requirement))
         except Exception as exc:
             print(exc)
-        print(f"Оценка компетенции: {self.name} ", mark_requirement)
+
+
+
 
 
 class TabConformity(Requirement):
@@ -222,6 +265,7 @@ class TabConformity(Requirement):
             mark_requirement = round(array_mark.mean(), 2)
             self.db.add_mark_requirement(self.current_expert, self.name, mark_requirement)
             print(f"Оценка конформизма: {self.name} ", mark_requirement)
+            self.mark_label.setText(str(mark_requirement))
         except Exception as exc:
             print(exc)
 

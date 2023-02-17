@@ -81,13 +81,26 @@ class Database:
         query = """
               SELECT r.name, r.weight, m_r.expert_id, m_r.mark, e.first_name, e.last_name from requirements r
               INNER JOIN mark_requirement m_r on r.requirement_name=m_r.requirement_name
-              INNER JOIN experts e on e.id=m_r.expert_id 
+              INNER JOIN experts e on e.expert_id=m_r.expert_id ORDER BY m_r.expert_id
               
           """
         self.cur.execute(query)
         res = self.cur.fetchall()
 
         return res
+
+    def get_count_experts(self) -> int:
+        query = """
+              SELECT COUNT(*) FROM experts
+
+          """
+        try:
+            self.cur.execute(query)
+            res = int(self.cur.fetchone()[0])
+        except Exception as exc:
+            res = 0
+        return res
+
 
 
 
