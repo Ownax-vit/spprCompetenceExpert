@@ -7,8 +7,10 @@ END;
 INSERT INTO requirements VALUES ("competence", "Оценка комп", "Оценка компетентности", 0.2);
 INSERT INTO requirements VALUES ("conformity", "Оценка конформизма", "Оценка конформизма", 0.15);
 
-INSERT INTO task_type VALUES ("question-variant", "Один вопрос-один ответ", "Выбор одного ответа");
+INSERT INTO task_type VALUES ("question_variant", "Один вопрос-один ответ", "Выбор одного ответа");
 INSERT INTO task_type VALUES ("check_multiple", "Чекбокс", "Выбор нескольких ответов");
+INSERT INTO task_type VALUES ("question_input", "Ввод", "Ввод ответа");
+INSERT INTO task_type VALUES ("question_combobox", "Комбобокс", "Выбор комбобокс");
 
 INSERT INTO  tasks VALUES (1, "competence", "question-variant", "Тестирование белого ящика", "Тестирование белого ящика это");
 INSERT INTO  tasks VALUES (2, "competence", "check_multiple", "Тестирование белого ящикаsdsd", "Тестирование белого ящика это");

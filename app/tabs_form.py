@@ -3,7 +3,7 @@ import random
 import numpy as np
 from PyQt6.QtWidgets import QWidget, QScrollArea, QBoxLayout, \
     QVBoxLayout, QRadioButton, QGroupBox, QLabel, QPushButton, QCheckBox, QComboBox, \
-    QTableWidget, QTableWidgetItem
+    QTableWidget, QTableWidgetItem, QLineEdit, QHBoxLayout
 from PyQt6.QtGui import QColor
 
 from .db import Database
@@ -111,10 +111,11 @@ class Requirement(QWidget):
         self.mark_label = QLabel("0")         # текущая оценка компетенции
         self.vbox_main = QVBoxLayout()
 
-
         # словарь типов задач
         self.dict_types_tasks = {"question-variant": self.render_variant,
                            "check_multiple": self.render_check_multiple,
+                           "question_input": self.render_input,
+                           "question_combobox": self.render_combobox,
                            # "question_checkbox": self.render_checkbox,
                            # "question_input": self.render_input
                            }
@@ -197,11 +198,46 @@ class Requirement(QWidget):
 
         return vbox_solution
 
+    def render_input(self, answers: list):
+        """ Рендер ответа в виде инпута ввода """
+        vbox_solution = QVBoxLayout()
+
+        for answer in answers:
+            input = QLineEdit()  # текст ответа
+            input.setFixedWidth(200)
+            input.setFixedHeight(30)
+            input.setTextMargins(5, 5, 5, 5)
+            input.setStyleSheet("QLineEdit"
+                                "{"
+                                "spacing : 20px;"
+                                "}")
+            input.mark = answer[2]
+            input.valid_answer = answer[4]
+            input.task_id = answer[1]
+            input.solution_id = answer[0]
+            input.textChanged.connect(self.assign_mark_to_answer)
+            vbox_solution.addWidget(input)
+
+        return vbox_solution
+
+    def render_combobox(self, answers):
+        """ Рендер ответа в виде комбобокса """
+        vbox_solution = QHBoxLayout()
+
+        combo = QComboBox()
+        for answer in answers:
+            combo.addItem(answer[3], userData={"mark": answer[2], "task_id": answer[1]})
+
+        combo.currentIndexChanged.connect(self.assign_mark_to_answer)
+        vbox_solution.addWidget(combo)
+        return vbox_solution
+
+
     def assign_mark_to_answer(self):
         """ Коллбек по клику на ответ, сохраняет значения оценок ответов в словарь ответов """
 
         sender = self.sender()   # выбранный ответ
-        if isinstance(sender, (QRadioButton, QComboBox)):
+        if isinstance(sender, QRadioButton):
             # если тип кнопки радио - один ответ, сохранение его оценки
             mark = sender.mark
             self.dict_answer_to_solution[sender.task_id] = mark
@@ -215,6 +251,19 @@ class Requirement(QWidget):
             else:
                 # если кнопка была отжата убираем ответ из списка
                 self.dict_answer_to_solution[sender.task_id].remove(sender.mark)
+        elif isinstance(sender, QLineEdit):
+            # если это инпут, то проверка на правильность ввода
+            answer = sender.text().upper().strip()
+            if answer == sender.valid_answer.upper().strip():
+                mark = sender.mark
+            else:
+                mark = 0
+            self.dict_answer_to_solution[sender.task_id] = mark
+        elif isinstance(sender, QComboBox):
+            data = sender.currentData()
+            mark = data["mark"]
+            task_id = data["task_id"]
+            self.dict_answer_to_solution[task_id] = mark
 
 
 class TabCompetence(Requirement):
@@ -226,7 +275,7 @@ class TabCompetence(Requirement):
 
     def calc_tab_mark(self):
         """Подсчет глобальной оценки эксперта по компетенции, с использованием словаря ответов"""
-        """Почему метод родительский? Возможно применение разных формул для подсчета компетенций """
+        """Почему метод не родительский? Возможно применение разных формул для подсчета компетенций """
         # добавить проверку ответа всех вопросов
         # для примера пусть это будет среднее всех ответов
         try:
@@ -264,7 +313,6 @@ class TabConformity(Requirement):
 
     def calc_tab_mark(self):
         """Подсчет глобальной оценки эксперта по компетенции, с использованием словаря ответов"""
-        """Почему метод родительский? Возможно применение разных формул для подсчета компетенций """
         # добавить проверку ответа всех вопросов
         # для примера пусть это будет среднее всех ответов
         try:

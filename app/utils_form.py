@@ -1,4 +1,4 @@
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QWidget, QPushButton
 from PyQt6.QtGui import QIcon
 from PyQt6.QtWidgets import QMessageBox
 from PyQt6.uic import loadUi
@@ -6,27 +6,27 @@ from PyQt6.uic import loadUi
 from .db import Database
 
 
-class ExpertForm(QtWidgets.QWidget):
+class ExpertForm(QWidget):
     def __init__(self):
         super().__init__()
         self.db = Database()
         self.setWindowTitle("Добавление пользователя")
         self.resize(300, 200)
-        layout = QtWidgets.QVBoxLayout()
-        self.label = QtWidgets.QLabel("Создание эксперта:")
+        layout = QVBoxLayout()
+        self.label = QLabel("Создание эксперта:")
         layout.addWidget(self.label)
 
-        labelName = QtWidgets.QLabel("Имя:")
+        labelName = QLabel("Имя:")
         layout.addWidget(labelName)
-        self.lineName = QtWidgets.QLineEdit()
+        self.lineName = QLineEdit()
         layout.addWidget(self.lineName)
 
-        labelSurname = QtWidgets.QLabel("Фамилия:")
+        labelSurname = QLabel("Фамилия:")
         layout.addWidget(labelSurname)
-        self.lineSurname = QtWidgets.QLineEdit()
+        self.lineSurname = QLineEdit()
         layout.addWidget(self.lineSurname)
 
-        addBtn = QtWidgets.QPushButton("Добавить")
+        addBtn = QPushButton("Добавить")
         layout.addWidget(addBtn)
         addBtn.clicked.connect(self.add_expert)
 

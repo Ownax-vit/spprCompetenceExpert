@@ -15,7 +15,6 @@ def transform_mark_requirement_to_dict(mark_requirement: list[tuple]) -> dict:
     dict_mark_competence = get_dict_weight_comp(mark_requirement)
     dict_res_mark = get_dict_result_mark(dict_mark, dict_mark_competence)
     dict_mark["Итого"] = dict_res_mark
-    print(dict_mark)
 
     return dict_mark
 
