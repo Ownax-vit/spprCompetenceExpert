@@ -1,13 +1,10 @@
 import random
 
 import numpy as np
-from PyQt6 import QtCore, QtGui
 from PyQt6.QtWidgets import QWidget, QScrollArea, QBoxLayout, \
     QVBoxLayout, QRadioButton, QGroupBox, QLabel, QPushButton, QCheckBox, QComboBox, \
     QTableWidget, QTableWidgetItem
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QIcon
-from PyQt6.uic import loadUi
+from PyQt6.QtGui import QColor
 
 from .db import Database
 from .utils import transform_mark_requirement_to_dict, get_list_id_experts, get_dict_expert_id_name
@@ -22,41 +19,83 @@ class Result(QWidget):
     def __init__(self):
         super().__init__()
         self.db = Database()
-        self.list_marks_requirement = self.db.get_all_marks_requirements_experts()
-        self.dict_marks_requirement = transform_mark_requirement_to_dict(self.list_marks_requirement)
+        self.list_marks_requirement = None
+        self.dict_marks_requirement = None
+        self.init_data_marks()
+        self.vbox_main = QVBoxLayout()
 
         self.render()
 
+    def init_data_marks(self):
+        self.list_marks_requirement = self.db.get_all_marks_requirements_experts()
+        self.dict_marks_requirement = transform_mark_requirement_to_dict(self.list_marks_requirement)
+
     def render(self):
         """ Рендер вкладки результатов """
-        table = QTableWidget(self)
+        btn_update = QPushButton("Обновить")
+        btn_update.setFixedHeight(40)
+        btn_update.setFixedWidth(150)
+        btn_update.clicked.connect(self.update_result_data)
+        self.vbox_main.addWidget(btn_update)
+
+        table = self.render_table()
+
+        self.vbox_main.addWidget(table)
+        self.setLayout(self.vbox_main)
+
+    def render_table(self) -> QTableWidget:
+        """ Рендер таблицы результатов по компетенциям / экспертам и итоговых данных """
+
+        self.init_data_marks()  # обновить данные оценок из БД
         dict_expert_name_id = get_dict_expert_id_name(self.dict_marks_requirement)
-        vbox_main = QVBoxLayout()
         list_id_experts_in_dict = sorted(get_list_id_experts(self.dict_marks_requirement))
         list_name_experts = list(dict_expert_name_id[i] for i in list_id_experts_in_dict)
 
-        count_rows = len(self.dict_marks_requirement.keys())
+        table = QTableWidget(self)
+
+        count_rows = len(self.dict_marks_requirement.keys()) # плюс последняя строка - глобал оценка
         count_cols = int(len(list_id_experts_in_dict))
 
-        table.setRowCount(count_rows)         # количество компетенций (вкладок)
-        table.setColumnCount(count_cols)      # количество экспертов
+        table.setRowCount(count_rows)       # количество компетенций (вкладок)
+        table.setColumnCount(count_cols)    # количество экспертов
 
         table.setHorizontalHeaderLabels(list_name_experts)
         table.setVerticalHeaderLabels(list(self.dict_marks_requirement.keys()))
 
-        # Set the table values
+        # заполнение таблицы
         for i, (competence, data) in enumerate(self.dict_marks_requirement.items()):
             for j, expert_id in enumerate(list_id_experts_in_dict):
                 expert_data = self.dict_marks_requirement[competence].get(expert_id)
                 if expert_data is None:
                     mark = 0
                 else:
-                    mark = expert_data.get("mark")
-                table.setItem(i, j, QTableWidgetItem(str(mark)))
+                    mark = expert_data.get("mark") if competence != "Итого" else \
+                        self.dict_marks_requirement[competence].get(expert_id)
+                cell = QTableWidgetItem(str(mark))
+                if competence == "Итого":
+                    cell.setBackground(QColor(217, 217, 217))
+                table.setItem(i, j, cell)
 
+        return table
 
-        vbox_main.addWidget(table)
-        self.setLayout(vbox_main)
+    def clear_vbox(self):
+        """ Очистить вкладку """
+        if self.vbox_main is not None:
+            while self.vbox_main.count():
+                item = self.vbox_main.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.deleteLater()
+                else:
+                    self.deleteLayout(item.layout())
+
+    def update_result_data(self):
+        """ Обновить данные """
+        self.clear_vbox()
+        self.render()
+
+    def calc_result_mark(self):
+        pass
 
 
 class Requirement(QWidget):
@@ -70,6 +109,8 @@ class Requirement(QWidget):
         self.description = description        # описание вкладки из БД
         self.weight = weight                  # глобальный вес компетенции
         self.mark_label = QLabel("0")         # текущая оценка компетенции
+        self.vbox_main = QVBoxLayout()
+
 
         # словарь типов задач
         self.dict_types_tasks = {"question-variant": self.render_variant,
@@ -79,33 +120,31 @@ class Requirement(QWidget):
                            }
         self.dict_answer_to_solution = {}
 
-
     def render(self):
         """ Рендер всей вкладки - все задачи, все ответы для задач """
         all_tasks = self.db.get_all_tasks_for_requirement(self.name)
         scroll_area = QScrollArea()  # скролл
         widget_tab = QWidget()
-        self.vbox = QVBoxLayout()
-        vbox_main = QVBoxLayout()
+        vbox = QVBoxLayout()
 
         for task in all_tasks:
             task_box = self.render_task(task)
-            self.vbox.addWidget(task_box)
+            vbox.addWidget(task_box)
 
         btn_send = QPushButton("Отправить")     # кнопка подсчета оценки компетенции
         btn_send.setFixedHeight(40)
         btn_send.setFixedWidth(150)
         btn_send.clicked.connect(self.calc_tab_mark)
-        self.vbox.addWidget(btn_send, 5)
+        vbox.addWidget(btn_send, 5)
 
-        self.vbox.addWidget(QLabel("Текущая оценка: "))
-        self.vbox.addWidget(self.mark_label)
+        vbox.addWidget(QLabel("Текущая оценка: "))
+        vbox.addWidget(self.mark_label)
 
-        widget_tab.setLayout(self.vbox)
+        widget_tab.setLayout(vbox)
         scroll_area.setWidgetResizable(True)
         scroll_area.setWidget(widget_tab)
-        vbox_main.addWidget(scroll_area)
-        self.setLayout(vbox_main)
+        self.vbox_main.addWidget(scroll_area)
+        self.setLayout(self.vbox_main)
 
     def render_task(self, task: list) -> QGroupBox:
         """Рендер задачи c ответами"""
@@ -177,19 +216,6 @@ class Requirement(QWidget):
                 # если кнопка была отжата убираем ответ из списка
                 self.dict_answer_to_solution[sender.task_id].remove(sender.mark)
 
-    def load_answers_from_db(self):
-        """ Вывести ответы во вкладки из БД """
-        raise NotImplementedError
-
-    def calc_tab_mark(self):
-        """Подсчет глобальной оценки эксперта по компетенции, с использованием словаря ответов"""
-        """ У каждой компетенции своя формула?"""
-        raise NotImplementedError
-
-    def save_mark_requirement(self, mark: float):
-        """Добавление оценки компетенции в бд"""
-        pass
-
 
 class TabCompetence(Requirement):
     """Вкладка оценки компетенции"""
@@ -227,9 +253,6 @@ class TabCompetence(Requirement):
             self.mark_label.setText(str(mark_requirement))
         except Exception as exc:
             print(exc)
-
-
-
 
 
 class TabConformity(Requirement):

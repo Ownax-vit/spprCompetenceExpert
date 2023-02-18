@@ -17,9 +17,9 @@ class ExpertSystemMain(QtWidgets.QMainWindow):
         self.db = Database()
         self.current_expert = None
 
-        self.comboExpert = self.comboExpert     # чекбокс экспертов из ui
-        self.expertManage = self.expertManage   # пункт управления экспертами из ui
-        self.expertMenu = self.expertMenu       # окно табов из ui
+        self.comboExpert = self.comboExpert     # QComboBox чекбокс экспертов из ui
+        self.expertManage = self.expertManage   # QAction пункт управления экспертами из ui
+        self.expertMenu = self.expertMenu       # QTabWidget - окно табов из ui
 
         # типы компетенций (типы вкладок)
         self.dict_tabs = {"competence": TabCompetence,
