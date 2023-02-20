@@ -264,19 +264,9 @@ class Requirement(QWidget):
             task_id = data["task_id"]
             self.dict_answer_to_solution[task_id] = mark
 
-
-class TabCompetence(Requirement):
-    """Вкладка оценки компетенции"""
-    def __init__(self, current_expert: str, name: str, description: str, weight: float):
-        super().__init__(current_expert, name, description, weight)
-        self.render()
-        # self.listLayoutChildWidgets()
-
     def calc_tab_mark(self):
         """Подсчет глобальной оценки эксперта по компетенции, с использованием словаря ответов"""
-        """Почему метод не родительский? Возможно применение разных формул для подсчета компетенций """
-        # добавить проверку ответа всех вопросов
-        # для примера пусть это будет среднее всех ответов
+
         try:
             if self.current_expert is None:
                 raise Exception("Не выбран эксперт")
@@ -296,13 +286,27 @@ class TabCompetence(Requirement):
                     lst_mark = np.array(list(answer))
                     mark = lst_mark.sum()
                     list_answer.append(mark)
-            array_mark = np.array(list_answer)
-            mark_requirement = round(array_mark.mean(), 2)
+
+            mark_requirement = self.get_global_mark(list_answer)
             self.db.add_mark_requirement(self.current_expert, self.name, mark_requirement)
             print(f"Оценка компетенции: {self.name} ", mark_requirement)
             self.mark_label.setText(str(mark_requirement))
         except Exception as exc:
             print(exc)
+
+    def get_global_mark(self, list_answer: list) -> float:
+        array_mark = np.array(list_answer)
+        mark_requirement = round(array_mark.mean(), 2)
+        return mark_requirement
+
+
+class TabCompetence(Requirement):
+    """Вкладка оценки компетенции"""
+    def __init__(self, current_expert: str, name: str, description: str, weight: float):
+        super().__init__(current_expert, name, description, weight)
+        self.render()
+        # self.listLayoutChildWidgets()
+
 
 
 class TabConformity(Requirement):
@@ -312,60 +316,18 @@ class TabConformity(Requirement):
         self.render()
         # self.listLayoutChildWidgets()
 
-    def render_variant(self, answers: list) -> QVBoxLayout():
-        """ Рендер повторяющих ответов """
-        vbox_solution = QVBoxLayout()
 
-        for answer in answers:
-            radio = QRadioButton(answer[3])     # Кнопка ответа с соответствующим текстом
-            radio.setStyleSheet("QRadioButton"
-                                       "{"
-                                       "spacing : 20px;"
-                                       "}")
-            radio.mark = answer[2]              # оценка за данный ответ
-            radio.task_id = answer[1]           # ид задачи (вопроса)
-            radio.solution_id = answer[0]       # ид ответа
-            radio.clicked.connect(self.assign_mark_to_answer)
-            vbox_solution.addWidget(radio)
-
-        return vbox_solution
-
-
-    def calc_tab_mark(self):
-        """Подсчет глобальной оценки эксперта по компетенции, с использованием словаря ответов"""
-        """Почему метод не родительский? Возможно применение разных формул для подсчета компетенций """
-        # добавить проверку ответа всех вопросов
-        # для примера пусть это будет среднее всех ответов
-        try:
-            if self.current_expert is None:
-                raise Exception("Не выбран эксперт")
-            list_answer = []
-            if not self.dict_answer_to_solution:
-                print("Словарь ответов пуст")
-                return
-
-            for solution, answer in self.dict_answer_to_solution.items():
-                if isinstance(answer, (int, float)):
-                    # если обычное число - оценка, добавляем в список оценок
-                    list_answer.append(answer)
-                elif isinstance(answer, list):
-                    # если список ответов - находим сумму этих оценок
-                    # чекбокс считается как сумма выбранных ответов,
-                    # причем ответы также должны быть отрицательными для компенсации суммы
-                    lst_mark = np.array(list(answer))
-                    mark = lst_mark.sum()
-                    list_answer.append(mark)
-            array_mark = np.array(list_answer)
-            mark_requirement = round(array_mark.mean(), 2)
-            self.db.add_mark_requirement(self.current_expert, self.name, mark_requirement)
-            print(f"Оценка компетенции: {self.name} ", mark_requirement)
-            self.mark_label.setText(str(mark_requirement))
-        except Exception as exc:
-            print(exc)
 
 
 class TabQualimetric(TabConformity):
-    pass
+    def __init__(self, current_expert: str, name: str, description: str, weight: float):
+        super().__init__(current_expert, name, description, weight)
+        self.render()
+
+    def get_global_mark(self, list_answer: list) -> float:
+        array_mark = np.array(list_answer)
+        mark_requirement = round(array_mark.sum(), 2)
+        return mark_requirement
 
 
 class TabSelfEsteem(TabConformity):

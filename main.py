@@ -85,7 +85,6 @@ class ExpertSystemMain(QMainWindow):
             print(exc)
 
 
-
 if __name__ == '__main__':
     app = QApplication([])
     application = ExpertSystemMain()

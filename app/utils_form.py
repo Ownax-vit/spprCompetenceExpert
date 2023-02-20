@@ -1,7 +1,4 @@
 from PyQt6.QtWidgets import QVBoxLayout, QLabel, QLineEdit, QWidget, QPushButton
-from PyQt6.QtGui import QIcon
-from PyQt6.QtWidgets import QMessageBox
-from PyQt6.uic import loadUi
 
 from .db import Database
 

@@ -1,3 +1,45 @@
+       create table experts(
+            expert_id integer not null primary key autoincrement,
+            first_name varchar(255) not null,
+            last_name varchar(255) not null
+        );
+           create table requirements(
+               requirement_name varchar(255) not null primary key,
+               name varchar(255) not null,
+               description varchar(255) not null,
+               weight decimal not null
+           );
+           create table task_type(
+               task_type varchar(255) not null primary key,
+               name varchar(255) not null,
+               description varchar(512)
+           );
+           create table tasks(
+               task_id integer not null primary key autoincrement,
+               requirement_name varchar(255) references requirements ON DELETE CASCADE ON UPDATE CASCADE,
+               task_type varchar(255) references task_type ON DELETE CASCADE ON UPDATE CASCADE,
+               name varchar(255) not null,
+               description varchar(512)
+           );
+         create table solutions(
+             solution_id integer not null primary key autoincrement,
+             task_id integer references tasks ON DELETE CASCADE ON UPDATE CASCADE,
+             mark decimal not null,
+             text varchar(255),
+             valid_answer varchar(255) default null
+         );
+         create table answers(
+             answer_id integer not null primary key autoincrement,
+             expert_id integer references experts ON DELETE CASCADE ON UPDATE CASCADE,
+             solution_id integer references answers ON DELETE CASCADE ON UPDATE CASCADE
+         );
+         create table mark_requirement(
+             mark_requirement_id integer not null primary key autoincrement,
+             expert_id integer references experts ON DELETE CASCADE ON UPDATE CASCADE,
+             requirement_name varchar(255) references requirements ON DELETE CASCADE ON UPDATE CASCADE,
+             mark decimal not null
+
+         );
 CREATE TRIGGER clear_mark_requirement BEFORE INSERT
 ON mark_requirement
 BEGIN
@@ -117,3 +159,120 @@ INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (11, 0.66, "З�
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (11, 0.66, "Незначительный (Minor)", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (11, 0.66, "Тривиальный (Trivial)", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (11, 0.66, "Низкий (Low)", "");
+
+
+INSERT INTO  tasks VALUES (12, "qualimetric", "question_combobox",
+"Сопоставьте категории метрик для проведения тестирования с их примерами. Качество тест-дизайна:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (12, 0.2, "Средняя экспертная оценка тестов", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (12, 0, "Средняя оценка пользователей", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (12, 0, "Производительность в динамике", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (12, 0, "Ложные прохождения тестов", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (12, 0, "Проведение тестов на поддерживаемых окружениях", "");
+
+INSERT INTO  tasks VALUES (13, "qualimetric", "question_combobox","Качество продукта:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (13, 0, "Средняя экспертная оценка тестов", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (13, 0.2, "Средняя оценка пользователей", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (13, 0, "Производительность в динамике", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (13, 0, "Ложные прохождения тестов", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (13, 0, "Проведение тестов на поддерживаемых окружениях", "");
+
+INSERT INTO  tasks VALUES (14, "qualimetric", "question_combobox","Характеристики качества ПО:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (14, 0, "Средняя экспертная оценка тестов", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (14, 0, "Средняя оценка пользователей", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (14, 0.2, "Производительность в динамике", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (14, 0, "Ложные прохождения тестов", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (14, 0, "Проведение тестов на поддерживаемых окружениях", "");
+
+INSERT INTO  tasks VALUES (15, "qualimetric", "question_combobox", "Автоматизированное тестирование:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (15, 0, "Средняя экспертная оценка тестов", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (15, 0, "Средняя оценка пользователей", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (15, 0, "Производительность в динамике", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (15, 0.2, "Ложные прохождения тестов", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (15, 0, "Проведение тестов на поддерживаемых окружениях", "");
+
+INSERT INTO  tasks VALUES (16, "qualimetric", "question_combobox", "Тестовое покрытие:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (16, 0, "Средняя экспертная оценка тестов", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (16, 0, "Средняя оценка пользователей", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (16, 0, "Производительность в динамике", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (16, 0, "Ложные прохождения тестов", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (16, 0.2, "Проведение тестов на поддерживаемых окружениях", "");
+
+INSERT INTO  tasks VALUES (17, "qualimetric", "question_combobox", "Присвойте каждому этапу тестирования их порядковый номер. Создание плана:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (17, 0.125, "2", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (17, 0, "5", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (17, 0, "7", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (17, 0, "4", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (17, 0, "8", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (17, 0, "3", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (17, 0, "1", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (17, 0, "6", "");
+
+INSERT INTO  tasks VALUES (18, "qualimetric", "question_combobox", "Тестирование билда:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (18, 0, "2", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (18, 0.125, "5", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (18, 0, "7", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (18, 0, "4", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (18, 0, "8", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (18, 0, "3", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (18, 0, "1", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (18, 0, "6", "");
+
+INSERT INTO  tasks VALUES (19, "qualimetric", "question_combobox", "Приемочное тестирование:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (19, 0, "2", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (19, 0, "5", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (19, 0.125, "7", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (19, 0, "4", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (19, 0, "8", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (19, 0, "3", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (19, 0, "1", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (19, 0, "6", "");
+
+INSERT INTO  tasks VALUES (20, "qualimetric", "question_combobox", "Тест дизайн:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (20, 0, "2", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (20, 0, "5", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (20, 0, "7", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (20, 0.125, "4", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (20, 0, "8", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (20, 0, "3", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (20, 0, "1", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (20, 0, "6", "");
+
+INSERT INTO  tasks VALUES (21, "qualimetric", "question_combobox", "Репорты и результаты:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0, "2", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0, "5", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0, "7", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0, "4", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0.125, "8", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0, "3", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0, "1", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0, "6", "");
+
+INSERT INTO  tasks VALUES (22, "qualimetric", "question_combobox", "Сбор требований:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (22, 0, "2", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (22, 0, "5", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (22, 0, "7", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (22, 0, "4", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (22, 0, "8", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (22, 0.125, "3", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (22, 0, "1", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (22, 0, "6", "");
+
+INSERT INTO  tasks VALUES (23, "qualimetric", "question_combobox", "Оценка проекта:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (23, 0, "2", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (23, 0, "5", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (23, 0, "7", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (23, 0, "4", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (23, 0, "8", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (23, 0, "3", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (23, 0.125, "1", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (23, 0, "6", "");
+
+INSERT INTO  tasks VALUES (24, "qualimetric", "question_combobox", "Выполнение тестов:", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (24, 0, "2", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (24, 0, "5", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (24, 0, "7", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (24, 0, "4", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (24, 0, "8", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (24, 0, "3", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (24, 0, "1", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (24, 0.125, "6", "");
