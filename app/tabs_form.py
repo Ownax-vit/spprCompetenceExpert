@@ -1,5 +1,3 @@
-import random
-
 import numpy as np
 from PyQt6.QtWidgets import QWidget, QScrollArea, QBoxLayout, \
     QVBoxLayout, QRadioButton, QGroupBox, QLabel, QPushButton, QCheckBox, QComboBox, \
@@ -94,9 +92,6 @@ class Result(QWidget):
         self.clear_vbox()
         self.render()
 
-    def calc_result_mark(self):
-        pass
-
 
 class Requirement(QWidget):
     """ Конкретная оценка компетенции к эксперту, представляет собой вкладку в окне"""
@@ -109,10 +104,12 @@ class Requirement(QWidget):
         self.description = description        # описание вкладки из БД
         self.weight = weight                  # глобальный вес компетенции
         self.mark_label = QLabel("0")         # текущая оценка компетенции
+        self.mark_label.setFixedHeight(40)
+        self.mark_label.setFixedWidth(200)
         self.vbox_main = QVBoxLayout()
 
         # словарь типов задач
-        self.dict_types_tasks = {"question-variant": self.render_variant,
+        self.dict_types_tasks = {"question_variant": self.render_variant,
                            "check_multiple": self.render_check_multiple,
                            "question_input": self.render_input,
                            "question_combobox": self.render_combobox,
@@ -151,16 +148,17 @@ class Requirement(QWidget):
         """Рендер задачи c ответами"""
         """ task_id, requirement_name, task_type, name, description """
 
-        groupBox = QGroupBox(task[4])
-        answers = self.db.get_all_solution_for_task(task[0])
+        group_box = QGroupBox(task[3])
+        solutions = self.db.get_all_solution_for_task(task[0])
 
         type_task = self.dict_types_tasks.get(task[2]) # получение метода рендеринга в зависимости от типа задачи
         if type_task is None:
             raise Exception("Не существует задачи в БД")
-        vbox_answers = type_task(answers)       # рендеринг по соответствующему методу
+        vbox_answers = type_task(solutions)       # рендеринг по соответствующему методу
 
-        groupBox.setLayout(vbox_answers)
-        return groupBox
+        group_box.setLayout(vbox_answers)
+
+        return group_box
 
     def render_variant(self, answers: list) -> QVBoxLayout():
         """ Рендер ответов в виде обычного выбора варианта """
@@ -203,20 +201,20 @@ class Requirement(QWidget):
         vbox_solution = QVBoxLayout()
 
         for answer in answers:
-            input = QLineEdit()  # текст ответа
-            input.setFixedWidth(200)
-            input.setFixedHeight(30)
-            input.setTextMargins(5, 5, 5, 5)
-            input.setStyleSheet("QLineEdit"
+            input_ans = QLineEdit()  # текст ответа
+            input_ans.setFixedWidth(200)
+            input_ans.setFixedHeight(30)
+            input_ans.setTextMargins(5, 5, 5, 5)
+            input_ans.setStyleSheet("QLineEdit"
                                 "{"
                                 "spacing : 20px;"
                                 "}")
-            input.mark = answer[2]
-            input.valid_answer = answer[4]
-            input.task_id = answer[1]
-            input.solution_id = answer[0]
-            input.textChanged.connect(self.assign_mark_to_answer)
-            vbox_solution.addWidget(input)
+            input_ans.mark = answer[2]
+            input_ans.valid_answer = answer[4]
+            input_ans.task_id = answer[1]
+            input_ans.solution_id = answer[0]
+            input_ans.textChanged.connect(self.assign_mark_to_answer)
+            vbox_solution.addWidget(input_ans)
 
         return vbox_solution
 
@@ -230,6 +228,7 @@ class Requirement(QWidget):
 
         combo.currentIndexChanged.connect(self.assign_mark_to_answer)
         vbox_solution.addWidget(combo)
+
         return vbox_solution
 
 
@@ -279,6 +278,8 @@ class TabCompetence(Requirement):
         # добавить проверку ответа всех вопросов
         # для примера пусть это будет среднее всех ответов
         try:
+            if self.current_expert is None:
+                raise Exception("Не выбран эксперт")
             list_answer = []
             if not self.dict_answer_to_solution:
                 print("Словарь ответов пуст")
@@ -311,11 +312,33 @@ class TabConformity(Requirement):
         self.render()
         # self.listLayoutChildWidgets()
 
+    def render_variant(self, answers: list) -> QVBoxLayout():
+        """ Рендер повторяющих ответов """
+        vbox_solution = QVBoxLayout()
+
+        for answer in answers:
+            radio = QRadioButton(answer[3])     # Кнопка ответа с соответствующим текстом
+            radio.setStyleSheet("QRadioButton"
+                                       "{"
+                                       "spacing : 20px;"
+                                       "}")
+            radio.mark = answer[2]              # оценка за данный ответ
+            radio.task_id = answer[1]           # ид задачи (вопроса)
+            radio.solution_id = answer[0]       # ид ответа
+            radio.clicked.connect(self.assign_mark_to_answer)
+            vbox_solution.addWidget(radio)
+
+        return vbox_solution
+
+
     def calc_tab_mark(self):
         """Подсчет глобальной оценки эксперта по компетенции, с использованием словаря ответов"""
+        """Почему метод не родительский? Возможно применение разных формул для подсчета компетенций """
         # добавить проверку ответа всех вопросов
         # для примера пусть это будет среднее всех ответов
         try:
+            if self.current_expert is None:
+                raise Exception("Не выбран эксперт")
             list_answer = []
             if not self.dict_answer_to_solution:
                 print("Словарь ответов пуст")
@@ -335,12 +358,18 @@ class TabConformity(Requirement):
             array_mark = np.array(list_answer)
             mark_requirement = round(array_mark.mean(), 2)
             self.db.add_mark_requirement(self.current_expert, self.name, mark_requirement)
-            print(f"Оценка конформизма: {self.name} ", mark_requirement)
+            print(f"Оценка компетенции: {self.name} ", mark_requirement)
             self.mark_label.setText(str(mark_requirement))
         except Exception as exc:
             print(exc)
 
 
+class TabQualimetric(TabConformity):
+    pass
+
+
+class TabSelfEsteem(TabConformity):
+    pass
 
 
 

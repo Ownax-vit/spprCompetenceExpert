@@ -26,9 +26,9 @@ class ExpertForm(QWidget):
         self.lineSurname = QLineEdit()
         layout.addWidget(self.lineSurname)
 
-        addBtn = QPushButton("Добавить")
-        layout.addWidget(addBtn)
-        addBtn.clicked.connect(self.add_expert)
+        self.addBtn = QPushButton("Добавить")
+        layout.addWidget(self.addBtn)
+        self.addBtn.clicked.connect(self.add_expert)
 
         self.setLayout(layout)
 

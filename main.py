@@ -1,15 +1,14 @@
 import sys
 
-from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtGui import QIcon
 from PyQt6.uic import loadUi
+from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from app.db import Database
 from app.utils_form import ExpertForm
-from app.tabs_form import Result, TabCompetence, TabConformity
+from app.tabs_form import Result, TabCompetence, TabConformity, TabQualimetric, TabSelfEsteem
 
 
-class ExpertSystemMain(QtWidgets.QMainWindow):
+class ExpertSystemMain(QMainWindow):
     def __init__(self):
         super().__init__()
         loadUi('ui/main.ui', self)
@@ -24,6 +23,8 @@ class ExpertSystemMain(QtWidgets.QMainWindow):
         # типы компетенций (типы вкладок)
         self.dict_tabs = {"competence": TabCompetence,
                           "conformity": TabConformity,
+                          "qualimetric": TabQualimetric,
+                          "self-esteem": TabSelfEsteem,
                            # "check_multiple": self.render_check_multiple,
                            # "question_checkbox": self.render_checkbox,
                            # "question_input": self.render_input
@@ -51,6 +52,7 @@ class ExpertSystemMain(QtWidgets.QMainWindow):
     def init_experts(self):
         """ Инициализация экспертов в чекбоксе"""
         experts = self.db.get_all_experts()
+        self.comboExpert.clear()
         for expert in experts:
             self.comboExpert.addItem(expert[1] + " " + expert[2], userData=expert[0])
         self.current_expert = self.comboExpert.currentData()  # данные в виде индекса эксперта
@@ -68,7 +70,7 @@ class ExpertSystemMain(QtWidgets.QMainWindow):
 
     def show_message(self, text: str):
         """ """
-        alert_msg = QtWidgets.QMessageBox(self)
+        alert_msg = QMessageBox(self)
         alert_msg.setWindowTitle("Уведомление")
         alert_msg.setText(text)
         alert_msg.exec()
@@ -77,10 +79,15 @@ class ExpertSystemMain(QtWidgets.QMainWindow):
         """ Окно управления экспертами """
         self.expert_form = ExpertForm()
         self.expert_form.show()
+        try:
+            self.expert_form.addBtn.clicked.connect(self.init_experts)
+        except Exception as exc:
+            print(exc)
+
 
 
 if __name__ == '__main__':
-    app = QtWidgets.QApplication([])
+    app = QApplication([])
     application = ExpertSystemMain()
     application.show()
     sys.exit(app.exec())
