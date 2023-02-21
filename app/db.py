@@ -30,7 +30,7 @@ class Database:
     def get_all_tasks_for_requirement(self, requirement_name: str) -> Optional[list[tuple]]:
 
         query = """
-            SELECT task_id, requirement_name, task_type, name, description FROM tasks 
+            SELECT task_id, requirement_name, task_type, name, description, weight FROM tasks 
             WHERE requirement_name = ?
         """
 
@@ -100,6 +100,15 @@ class Database:
         except Exception as exc:
             res = 0
         return res
+
+    def clear_results(self):
+        query = """
+                 DELETE FROM mark_requirement
+
+             """
+        self.cur.execute(query)
+        self.con.commit()
+
 
 
 
