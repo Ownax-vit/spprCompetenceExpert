@@ -8,7 +8,7 @@ def main():
     name_db = Config.name_db
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
-    with open("data.sql", "r", encoding='utf-8' ) as file:
+    with open("data.sql", "r", encoding='utf-8') as file:
         data_sql = file.read()
 
     pathTodb = '\\'.join(dir_path.split('\\')[:-1])

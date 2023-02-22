@@ -1,11 +1,12 @@
-import sys
+import sys, os
 
 from PyQt6.uic import loadUi
 from PyQt6.QtWidgets import QApplication, QMainWindow, QMessageBox
 
+from app.config import Config
 from app.db import Database
 from app.utils_form import ExpertForm
-from app.tabs_form import Result, TabCompetence, TabConformity, TabQualimetric, TabSelfEsteem
+from app.tabs_form import Result, TabCompetence, TabConformity, TabQualimetric, TabSelfEsteem, TabWorkingGroup
 
 
 class ExpertSystemMain(QMainWindow):
@@ -25,9 +26,7 @@ class ExpertSystemMain(QMainWindow):
                           "conformity": TabConformity,
                           "qualimetric": TabQualimetric,
                           "self-esteem": TabSelfEsteem,
-                           # "check_multiple": self.render_check_multiple,
-                           # "question_checkbox": self.render_checkbox,
-                           # "question_input": self.render_input
+                          "working-group": TabWorkingGroup,
                            }
 
         self.init_experts()
@@ -86,6 +85,11 @@ class ExpertSystemMain(QMainWindow):
 
 
 if __name__ == '__main__':
+
+    if not os.path.exists(Config.name_db):
+        from scripts.create_db import main
+        main()
+
     app = QApplication([])
     application = ExpertSystemMain()
     application.show()

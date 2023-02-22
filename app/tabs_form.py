@@ -30,6 +30,7 @@ class Result(QWidget):
 
     def render(self):
         """ Рендер вкладки результатов """
+
         btn_update = QPushButton("Обновить")
         btn_update.setFixedHeight(40)
         btn_update.setFixedWidth(150)
@@ -43,41 +44,39 @@ class Result(QWidget):
 
     def render_table(self) -> QTableWidget:
         """ Рендер таблицы результатов по компетенциям / экспертам и итоговых данных """
-        try:
-            self.init_data_marks()  # обновить данные оценок из БД
-            dict_expert_name_id = get_dict_expert_id_name(self.dict_marks_requirement)
-            list_id_experts_in_dict = sorted(get_list_id_experts(self.dict_marks_requirement))
-            list_name_experts = list(dict_expert_name_id[i] for i in list_id_experts_in_dict)
+        self.init_data_marks()  # обновить данные оценок из БД
+        dict_expert_name_id = get_dict_expert_id_name(self.dict_marks_requirement)
+        list_id_experts_in_dict = sorted(get_list_id_experts(self.dict_marks_requirement))
+        list_name_experts = list(dict_expert_name_id[i] for i in list_id_experts_in_dict)
 
-            table = QTableWidget(self)
+        table = QTableWidget(self)
 
-            count_rows = len(self.dict_marks_requirement.keys())  # плюс последняя строка - глобал оценка
-            count_cols = int(len(list_id_experts_in_dict))
+        count_rows = len(self.dict_marks_requirement.keys())  # плюс последняя строка - глобал оценка
+        count_cols = int(len(list_id_experts_in_dict))
 
-            table.setRowCount(count_rows)  # количество компетенций (вкладок)
-            table.setColumnCount(count_cols)  # количество экспертов
+        table.setRowCount(count_rows)  # количество компетенций (вкладок)
+        table.setColumnCount(count_cols)  # количество экспертов
 
-            table.setHorizontalHeaderLabels(list_name_experts)
-            table.setVerticalHeaderLabels(list(self.dict_marks_requirement.keys()))
+        table.setHorizontalHeaderLabels(list_name_experts)
+        table.setVerticalHeaderLabels(list(self.dict_marks_requirement.keys()))
 
-            # заполнение таблицы
-            for i, (competence, data) in enumerate(self.dict_marks_requirement.items()):
-                for j, expert_id in enumerate(list_id_experts_in_dict):
-                    expert_data = self.dict_marks_requirement[competence].get(expert_id)
-                    if expert_data is None:
-                        mark = 0
-                    else:
-                        mark = expert_data.get("mark") if competence != "Итого" else \
-                            self.dict_marks_requirement[competence].get(expert_id)
-                    cell = QTableWidgetItem(str(mark))
-                    if competence == "Итого":
-                        cell.setBackground(QColor(217, 217, 217))
-                    table.setItem(i, j, cell)
+        # заполнение таблицы
+        for i, (competence, data) in enumerate(self.dict_marks_requirement.items()):
+            for j, expert_id in enumerate(list_id_experts_in_dict):
+                expert_data = self.dict_marks_requirement[competence].get(expert_id)
+                if expert_data is None:
+                    mark = 0
+                else:
+                    mark = expert_data.get("mark") if competence != "Итого" else \
+                        self.dict_marks_requirement[competence].get(expert_id)
+                cell = QTableWidgetItem(str(mark))
+                if competence == "Итого":
+                    cell.setBackground(QColor(217, 217, 217))
+                table.setItem(i, j, cell)
 
-            return table
-        except Exception as exc:
-            print(exc)
-            self.db.clear_results()
+        return table
+        print(exc)
+        # self.db.clear_results()
 
     def clear_vbox(self):
         """ Очистить вкладку """
@@ -240,7 +239,6 @@ class Requirement(QWidget):
 
         return vbox_solution
 
-
     def assign_mark_to_answer(self):
         """ Коллбек по клику на ответ, сохраняет значения оценок ответов в словарь ответов """
 
@@ -295,12 +293,14 @@ class Requirement(QWidget):
                     mark = lst_mark.sum()
                     list_answer.append(mark)
             mark_requirement = self.get_global_mark(list_answer)
+            print("Оценка", mark_requirement)
             self.add_show_result(mark_requirement)
         except Exception as exc:
             print(exc)
 
     def add_show_result(self, mark_requirement: float):
         """ Добавить оценку в БД и отобразить результаты """
+        print("mark this", mark_requirement)
         self.db.add_mark_requirement(self.current_expert, self.name, mark_requirement)
         print(f"Оценка компетенции: {self.name} ", mark_requirement)
         self.mark_label.setText(str(mark_requirement))
@@ -309,7 +309,7 @@ class Requirement(QWidget):
         """ вычислить оценку компетенции """
         array_mark = np.array(list_answer)
         mark_requirement = round(array_mark.sum(), 2)
-        return mark_requirement
+        return float(mark_requirement)
 
 
 class TabCompetence(Requirement):
@@ -371,15 +371,17 @@ class TabQualimetric(Requirement):
     def __init__(self, current_expert: str, name: str, description: str, weight: float):
         super().__init__(current_expert, name, description, weight)
         self.dict_weight_tasks = {}
+        self.init_dict_weight_tasks()
 
     def init_dict_weight_tasks(self):
+        """ Инициализация словаря весов задач"""
         tasks = self.db.get_all_tasks_for_requirement(self.name)
         for task in tasks:
             if task[0] not in self.dict_weight_tasks:
                 self.dict_weight_tasks[task[0]] = task[5]
 
     def calc_tab_mark(self):
-        """Подсчет глобальной оценки эксперта по компетенции, с использованием словаря ответов"""
+        """Подсчет глобальной оценки эксперта по компетенции, с использованием словарей ответов и весов задач"""
         try:
             if self.current_expert is None:
                 raise Exception("Не выбран эксперт")
@@ -402,9 +404,13 @@ class TabQualimetric(Requirement):
             self.add_show_result(mark_requirement)
         except Exception as exc:
             print("Exception", exc)
+            self.add_show_result(0)
 
 
 class TabSelfEsteem(Requirement):
+    pass
+
+class TabWorkingGroup(Requirement):
     pass
 
 

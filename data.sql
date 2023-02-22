@@ -51,6 +51,7 @@ INSERT INTO requirements VALUES ("competence", "Профессиональная
 INSERT INTO requirements VALUES ("conformity", "Оценка конформизма", "Пройдите оценку конформизма:", 0.15);
 INSERT INTO requirements VALUES ("qualimetric", "Квалиметрическая компетентность", "Ответьте на все вопросы:", 0.15);
 INSERT INTO requirements VALUES ("self-esteem", "Самооценка", "Сопоставьте компетенции с соответствующим уровнем:", 0.15);
+INSERT INTO requirements VALUES ("working-group", "Оценка рабочей группой", "Оценка компетенции рабочей группой:", 0.15);
 
 
 INSERT INTO task_type VALUES ("question_variant", "Один вопрос-один ответ", "Выбор одного ответа");
@@ -268,3 +269,30 @@ INSERT INTO tasks (task_id, requirement_name, task_type, name, description) VALU
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (29, 0, "минимальный", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (29, 0.5, "средний", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (29, 1, "высокий", "");
+
+INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (30, "working-group", "question_variant", "Опыт работы в области тестирования:",
+"");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (30, 2, "Большой (от 5 лет)", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (30, 1, "Средний (3-5 года)", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (30, 0.5, "Низкий (1-2 года)", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (30, 0, "Нет опыта", "");
+
+INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (31, "working-group", "question_variant", "Уровень образования:",
+"");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (31, 2, "Высший профильный", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (31, 1, "Средний профильный", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (31, 0.5, "Высший непрофильный", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (31, 0, "Средний непрофильный", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (31, 0, "Иное", "");
+
+INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (32, "working-group", "question_variant", "Навыки решения алгоритмических задач:",
+"");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (32, 2, "Высокие", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (32, 1, "Средние", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (32, 0.5, "Низкий", "");
+
+INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (33, "working-group", "question_variant", "Знания профильного инструментария:",
+"");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (33, 2, "Высокие", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (33, 1, "Средние", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (33, 0, "Низкий", "");
