@@ -7,7 +7,7 @@ from app.config import Config
 def main():
     name_db = Config.name_db
     dir_path = os.path.dirname(os.path.realpath(__file__))
-
+    print("creating db ..")
     with open("data.sql", "r", encoding='utf-8') as file:
         data_sql = file.read()
 
@@ -20,6 +20,7 @@ def main():
 
     engine.commit()
     session.close()
+    print("db created.")
 
 
 if __name__ == '__main__':

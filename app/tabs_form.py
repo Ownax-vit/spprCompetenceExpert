@@ -293,14 +293,12 @@ class Requirement(QWidget):
                     mark = lst_mark.sum()
                     list_answer.append(mark)
             mark_requirement = self.get_global_mark(list_answer)
-            print("Оценка", mark_requirement)
             self.add_show_result(mark_requirement)
         except Exception as exc:
             print(exc)
 
     def add_show_result(self, mark_requirement: float):
         """ Добавить оценку в БД и отобразить результаты """
-        print("mark this", mark_requirement)
         self.db.add_mark_requirement(self.current_expert, self.name, mark_requirement)
         print(f"Оценка компетенции: {self.name} ", mark_requirement)
         self.mark_label.setText(str(mark_requirement))
@@ -356,7 +354,6 @@ class TabConformity(Requirement):
                 return
             elif dlg_window.clickedButton() == yes_btn:
                 self.db.add_mark_requirement(self.current_expert, self.name, mark_requirement)
-                print(f"Оценка конформизма: {self.name} ", mark_requirement)
         else:
             mark_requirement = 0
 
