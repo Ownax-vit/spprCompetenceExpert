@@ -24,7 +24,6 @@ class Database:
         query = """SELECT requirement_name, name, description, weight FROM requirements"""
         self.cur.execute(query)
         res = self.cur.fetchall()
-        print(res)
         return res
 
     def get_all_tasks_for_requirement(self, requirement_name: str) -> Optional[list[tuple]]:
@@ -36,7 +35,6 @@ class Database:
 
         self.cur.execute(query, (requirement_name,))
         res = self.cur.fetchall()
-        print(res)
         return res
 
     def get_all_solution_for_task(self, task_id: int) -> Optional[list[tuple]]:

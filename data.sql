@@ -63,9 +63,9 @@ INSERT INTO task_type VALUES ("question_combobox", "Комбобокс", "Выб
 INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (1, "competence", "question_variant", "Выберите подходы к тестированию ПО",
 "Выберите подходы к тестированию ПО");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (1, 0.66, "Белый ящик", "");
-INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES ( 1, -0.66, "Позитивное тестирование", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES ( 1, 0, "Позитивное тестирование", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (1, 0.66, "Серый ящик", "");
-INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (1, -0.66, "Тест план", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (1, 0, "Тест план", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (1, 0.66, "Черный ящик", "");
 
 INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (2, "competence", "question_variant", "Тестирование белого ящика - это:",
@@ -104,20 +104,20 @@ INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (4, 0, "Про�
 
 INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (5, "competence", "check_multiple", "Выберите этапы жизненного цикла тестирования ПО:", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, 0.25, "Планирование тестов", "");
-INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, -0.25, "Разработка", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, 0, "Разработка", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, 0.25, "Создание тест-кейсов", "");
-INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, -0.25, "Системное проектирование", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, 0, "Системное проектирование", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, 0.25, "Настройка тестового окружения", "");
-INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, -0.25, "Внедрение ПО", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, 0, "Внедрение ПО", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, 0.25, "Выполнение тестов", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (5, 0.25, "Поддержка тестов", "");
 
 INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (6, "competence", "check_multiple", "Что такое верификация и валидация в тестировании?", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (6, 1.5, "Верификация - это техника статического анализа,
  то есть тестирование идет без выполнения кода. Например, ревью кода, его инспекция, и разбор.", "");
-INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (6, -1.5, "Валидация - набор определенных шагов,
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (6, 0, "Валидация - набор определенных шагов,
 по которым проверяется функциональность системы.", "");
-INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (6, -1.5, "Верификация - Это часть тест-плана,
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (6, 0, "Верификация - Это часть тест-плана,
 описывающая, как проводится тестирование и какие разновидности тестирования необходимо сделать.", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (6, 1.5, "Валидация – это техника динамического анализа,
 с выполнением кода приложения. При валидации могут быть как функциональные, так и нефункциональные техники тестирования.", "");
@@ -139,9 +139,9 @@ INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (9, 4, "Это 
 
 INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (10, "competence", "check_multiple", "Какие бывают ограничения SQL?", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (10, 0.66, "NOT NULL", "");
-INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (10, -0.66, "INTEGER", "");
-INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (10, -0.66, "NULL", "");
-INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (10, -0.66, "FLOAT", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (10, 0, "INTEGER", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (10, 0, "NULL", "");
+INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (10, 0, "FLOAT", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (10, 0.66, "FOREIGN KEY", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (10, 0.66, "UNIQUE", "");
 
