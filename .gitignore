@@ -144,3 +144,4 @@ cython_debug/
 *.sql
 
 *.db
+__pycache__
