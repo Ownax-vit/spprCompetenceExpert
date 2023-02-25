@@ -21,7 +21,11 @@ class Database:
 
     def get_all_requirements(self) -> Optional[list[tuple]]:
         """ Получить все требования для оценки, вкладки"""
-        query = """SELECT requirement_name, name, description, weight FROM requirements"""
+        query = """
+            SELECT 
+                    requirement_name, name, description, weight 
+            FROM 
+                    requirements"""
         self.cur.execute(query)
         res = self.cur.fetchall()
         return res
@@ -29,8 +33,12 @@ class Database:
     def get_all_tasks_for_requirement(self, requirement_name: str) -> Optional[list[tuple]]:
 
         query = """
-            SELECT task_id, requirement_name, task_type, name, description, weight FROM tasks 
-            WHERE requirement_name = ?
+            SELECT 
+                    task_id, requirement_name, task_type, name, description, weight 
+            FROM 
+                    tasks 
+            WHERE 
+                    requirement_name = ?
         """
 
         self.cur.execute(query, (requirement_name,))
@@ -39,7 +47,12 @@ class Database:
 
     def get_all_solution_for_task(self, task_id: int) -> Optional[list[tuple]]:
         query = """
-              SELECT solution_id, task_id, mark, text, valid_answer FROM solutions WHERE task_id = ?
+              SELECT 
+                    solution_id, task_id, mark, text, valid_answer 
+              FROM 
+                    solutions 
+              WHERE 
+                    task_id = ?
           """
         self.cur.execute(query, (task_id,))
         res = self.cur.fetchall()
@@ -48,7 +61,10 @@ class Database:
 
     def get_all_experts(self) -> Optional[list[tuple]]:
         query = """
-              SELECT expert_id, first_name, last_name FROM experts
+              SELECT 
+                    expert_id, first_name, last_name 
+              FROM 
+                    experts
           """
         self.cur.execute(query)
         res = self.cur.fetchall()
@@ -57,29 +73,48 @@ class Database:
 
     def add_expert(self, f_name: str, l_name: str):
         query = """
-              INSERT INTO experts (first_name, last_name) VALUES (?, ?)
+              INSERT INTO 
+                    experts (first_name, last_name) 
+              VALUES 
+                    (?, ?)
           """
         self.cur.execute(query, (f_name, l_name))
         self.con.commit()
 
     def add_answer(self, solution_id: int, expert_id: int, mark: float):
         query = """
-             INSERT INTO answers (solution_id, expert_id, mark) VALUES (?, ?)
+             INSERT INTO 
+                    answers (solution_id, expert_id, mark)
+             VALUES 
+                    (?, ?)
         """
 
-    def add_mark_requirement(self, expert_id: int, requirement_name: str, mark: float):
+    def add_mark_requirement(self, expert_id: int, norm_mark: str, mark: float):
         query = """
-              INSERT INTO mark_requirement (expert_id, requirement_name, mark) VALUES (?, ?, ?)
+              INSERT INTO 
+                    mark_requirement (expert_id, requirement_name, mark) 
+              VALUES 
+                    (?, ?, ?)
 
           """
-        self.cur.execute(query, (expert_id, requirement_name, mark))
+        self.cur.execute(query, (expert_id, norm_mark, mark))
         self.con.commit()
 
     def get_all_marks_requirements_experts(self):
         query = """
-              SELECT r.name, r.weight, m_r.expert_id, m_r.mark, e.first_name, e.last_name from requirements r
-              INNER JOIN mark_requirement m_r on r.requirement_name=m_r.requirement_name
-              INNER JOIN experts e on e.expert_id=m_r.expert_id ORDER BY m_r.expert_id
+              SELECT 
+                    r.name, r.weight, m_r.expert_id, m_r.mark, 
+                    e.first_name, e.last_name 
+              FROM 
+                    requirements r
+              INNER JOIN 
+                    mark_requirement m_r 
+              ON 
+                    r.requirement_name=m_r.requirement_name
+              INNER JOIN 
+                    experts e on e.expert_id=m_r.expert_id 
+              ORDER BY 
+                    m_r.expert_id
               
           """
         self.cur.execute(query)
@@ -106,6 +141,20 @@ class Database:
              """
         self.cur.execute(query)
         self.con.commit()
+
+    def get_sum_marks_requirement(self, requirement_name: str) -> float:
+        query = """
+            SELECT 
+                sum(solutions.mark) 
+            FROM 
+                solutions 
+            inner join 
+                tasks ON solutions.task_id=tasks.task_id 
+            WHERE tasks.requirement_name=?
+        """
+        self.cur.execute(query, (requirement_name,))
+        res = self.cur.fetchone()
+        return res
 
 
 

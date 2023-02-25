@@ -114,9 +114,15 @@ class Requirement(QWidget):
                            "check_multiple": self.render_check_multiple,
                            "question_input": self.render_input,
                            "question_combobox": self.render_combobox,
-                           # "question_checkbox": self.render_checkbox,
-                           # "question_input": self.render_input
                            }
+        # словарь максимально возможных баллов за компетенцию
+        self.dict_max_marks = {
+            "competence": 26.21,
+            "conformity": 3,
+            "qualimetric": 0.36,
+            "self-esteem": 5,
+            "working-group": 8,
+        }
         self.dict_answer_to_solution = {}
         self.render()
 
@@ -293,7 +299,8 @@ class Requirement(QWidget):
                     mark = lst_mark.sum()
                     list_answer.append(mark)
             mark_requirement = self.get_global_mark(list_answer)
-            self.add_show_result(mark_requirement)
+            norm_mark = self.get_norm_mark(mark_requirement)
+            self.add_show_result(norm_mark)
         except Exception as exc:
             print(exc)
 
@@ -304,17 +311,22 @@ class Requirement(QWidget):
         self.mark_label.setText(str(mark_requirement))
 
     def get_global_mark(self, list_answer: list) -> float:
-        """ вычислить оценку компетенции """
+        """ Вычислить нормированную оценку компетенции """
         array_mark = np.array(list_answer)
         mark_requirement = round(array_mark.sum(), 2)
-        return float(mark_requirement)
+        return mark_requirement
+
+    def get_norm_mark(self, mark_requirement: float) -> float:
+        """ Получить нормированную оценки от 0 до 1 в соответствии со словарем макс. баллов"""
+        max_mark = self.dict_max_marks.get(self.name)
+        norm_mark_requirement = round(float(mark_requirement / max_mark), 2)
+        return norm_mark_requirement
 
 
 class TabCompetence(Requirement):
     """Вкладка оценки компетенции"""
     def __init__(self, current_expert: str, name: str, description: str, weight: float):
         super().__init__(current_expert, name, description, weight)
-        # self.listLayoutChildWidgets()
 
 
 class TabConformity(Requirement):
@@ -323,7 +335,7 @@ class TabConformity(Requirement):
         super().__init__(current_expert, name, description, weight)
         self.checked_conformity = False # была ли проверка конформизма
 
-    def add_show_result(self, mark_requirement: float):
+    def add_show_result(self, norm_mark: float):
         """ Окно подтверждения результатов для конформизма  """
         if self.checked_conformity == True:
             dlg = QMessageBox(self)
@@ -335,7 +347,7 @@ class TabConformity(Requirement):
             dlg.exec()
             return
 
-        if mark_requirement == float(3):
+        if norm_mark == float(1):
             # если ответ правильный - показ окна проверки конформизма
             self.checked_conformity = True  # помечаем что осуществляется проверка конформизма
             dlg_window = QMessageBox(self)
@@ -353,15 +365,13 @@ class TabConformity(Requirement):
                 # проверка не пройдена
                 return
             elif dlg_window.clickedButton() == yes_btn:
-                self.db.add_mark_requirement(self.current_expert, self.name, mark_requirement)
+                self.db.add_mark_requirement(self.current_expert, self.name, norm_mark)
         else:
-            mark_requirement = 0
+            norm_mark = 0
 
-        self.db.add_mark_requirement(self.current_expert, self.name, mark_requirement)
-        print(f"Оценка конформизма: {self.name} ", mark_requirement)
-        self.mark_label.setText(str(mark_requirement))
-
-
+        self.db.add_mark_requirement(self.current_expert, self.name, norm_mark)
+        print(f"Оценка конформизма: {self.name} ", norm_mark)
+        self.mark_label.setText(str(norm_mark))
 
 
 class TabQualimetric(Requirement):
@@ -398,7 +408,9 @@ class TabQualimetric(Requirement):
                     lst_mark = np.array(list(answer))
                     mark = lst_mark.sum()
                     mark_requirement += mark * self.dict_weight_tasks[task_id]
-            self.add_show_result(mark_requirement)
+            mark_requirement = round(mark_requirement, 2)
+            norm_mark = self.get_norm_mark(mark_requirement)
+            self.add_show_result(norm_mark)
         except Exception as exc:
             print("Exception", exc)
             self.add_show_result(0)
@@ -406,6 +418,7 @@ class TabQualimetric(Requirement):
 
 class TabSelfEsteem(Requirement):
     pass
+
 
 class TabWorkingGroup(Requirement):
     pass

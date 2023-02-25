@@ -28,7 +28,6 @@ class ExpertSystemMain(QMainWindow):
                           "self-esteem": TabSelfEsteem,
                           "working-group": TabWorkingGroup,
                            }
-
         self.init_experts()
         self.init_tabs()
 

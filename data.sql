@@ -29,11 +29,11 @@
              text varchar(255),
              valid_answer varchar(255) default null
          );
-         create table answers(
-             answer_id integer not null primary key autoincrement,
-             expert_id integer references experts ON DELETE CASCADE ON UPDATE CASCADE,
-             solution_id integer references answers ON DELETE CASCADE ON UPDATE CASCADE
-         );
+--         create table answers(
+--             answer_id integer not null primary key autoincrement,
+--             expert_id integer references experts ON DELETE CASCADE ON UPDATE CASCADE,
+--             solution_id integer references answers ON DELETE CASCADE ON UPDATE CASCADE
+--         );
          create table mark_requirement(
              mark_requirement_id integer not null primary key autoincrement,
              expert_id integer references experts ON DELETE CASCADE ON UPDATE CASCADE,
@@ -47,11 +47,11 @@ BEGIN
 	DELETE FROM mark_requirement WHERE NEW.requirement_name=requirement_name AND NEW.expert_id=expert_id;
 END;
 
-INSERT INTO requirements VALUES ("competence", "Профессиональная компетентность", "Ответьте на все вопросы:", 0.2);
-INSERT INTO requirements VALUES ("conformity", "Оценка конформизма", "Пройдите оценку конформизма:", 0.15);
-INSERT INTO requirements VALUES ("qualimetric", "Квалиметрическая компетентность", "Ответьте на все вопросы:", 0.15);
+INSERT INTO requirements VALUES ("competence", "Профессиональная компетентность", "Ответьте на все вопросы:", 0.3);
+INSERT INTO requirements VALUES ("conformity", "Оценка конформизма", "Пройдите оценку конформизма:", 0.2);
+INSERT INTO requirements VALUES ("qualimetric", "Квалиметрическая компетентность", "Ответьте на все вопросы:", 0.17);
 INSERT INTO requirements VALUES ("self-esteem", "Самооценка", "Сопоставьте компетенции с соответствующим уровнем:", 0.15);
-INSERT INTO requirements VALUES ("working-group", "Оценка рабочей группой", "Оценка компетенции рабочей группой:", 0.15);
+INSERT INTO requirements VALUES ("working-group", "Оценка рабочей группой", "Оценка компетенции рабочей группой:", 0.18);
 
 
 INSERT INTO task_type VALUES ("question_variant", "Один вопрос-один ответ", "Выбор одного ответа");
@@ -60,7 +60,7 @@ INSERT INTO task_type VALUES ("question_input", "Ввод", "Ввод ответ
 INSERT INTO task_type VALUES ("question_combobox", "Комбобокс", "Выбор комбобокс");
 
 
-INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (1, "competence", "question_variant", "Выберите подходы к тестированию ПО",
+INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VALUES (1, "competence", "check_multiple", "Выберите подходы к тестированию ПО",
 "Выберите подходы к тестированию ПО");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (1, 0.66, "Белый ящик", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES ( 1, 0, "Позитивное тестирование", "");
@@ -215,7 +215,7 @@ INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (20, 0.125, "В
 
 
 INSERT INTO tasks (task_id, requirement_name, task_type, name, description, weight) VALUES
- (21, "qualimetric", "question_combobox", "Шкала отношений", "", 0.2);
+ (21, "qualimetric", "question_combobox", "Абсолютная шкала", "", 0.2);
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0, "Ничего из перечисленного", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0.125, "Единица измерения", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (21, 0, "Нуль физической величины", "");
