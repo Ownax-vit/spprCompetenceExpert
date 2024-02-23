@@ -1,15 +1,13 @@
-import os
 import sqlite3
 
 from app.config import Config
-
+from scripts.data import init_data
 
 def main():
     name_db = Config.name_db
     print("creating db ..")
-    with open("data.sql", "r", encoding='utf-8') as file:
-        data_sql = file.read()
 
+    data_sql = init_data
     pathTodb = f"{name_db}"
 
     engine = sqlite3.connect(pathTodb)

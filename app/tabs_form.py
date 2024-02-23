@@ -1,8 +1,10 @@
 import numpy as np
-from PyQt6.QtWidgets import QWidget, QScrollArea, QBoxLayout, \
+from PyQt6 import QtCore
+from PyQt6.QtWidgets import QWidget, QScrollArea, QBoxLayout,\
     QVBoxLayout, QRadioButton, QGroupBox, QLabel, QPushButton, QCheckBox, QComboBox, \
-    QTableWidget, QTableWidgetItem, QLineEdit, QHBoxLayout, QSpacerItem, QSizePolicy, QMessageBox
+    QTableWidget, QTableWidgetItem, QLineEdit, QHBoxLayout, QSpacerItem, QSizePolicy, QMessageBox, QGridLayout
 from PyQt6.QtGui import QColor
+import pyqtgraph as pg 
 
 from .db import Database
 from .utils import transform_mark_requirement_to_dict, get_list_id_experts, get_dict_expert_id_name
@@ -20,7 +22,8 @@ class Result(QWidget):
         self.list_marks_requirement = None
         self.dict_marks_requirement = None
         self.init_data_marks()
-        self.vbox_main = QVBoxLayout()
+        # self.vbox_main = QVBoxLayout()
+        self.vbox_main = QGridLayout()
 
         self.render()
 
@@ -38,8 +41,11 @@ class Result(QWidget):
         self.vbox_main.addWidget(btn_update)
 
         table = self.render_table()
-
         self.vbox_main.addWidget(table)
+
+        plot = self.render_plot() # TODO
+        self.vbox_main.addWidget(plot)
+
         self.setLayout(self.vbox_main)
 
     def render_table(self) -> QTableWidget:
@@ -75,8 +81,33 @@ class Result(QWidget):
                 table.setItem(i, j, cell)
 
         return table
-        print(exc)
-        # self.db.clear_results()
+    
+    def render_plot(self) -> pg.PlotWidget:
+        plot = pg.plot(background="w")
+         # create list for y-axis
+        y = [] # эксперты
+
+        dict_expert_name_id = get_dict_expert_id_name(self.dict_marks_requirement)
+        list_id_experts_in_dict = sorted(get_list_id_experts(self.dict_marks_requirement))
+        list_name_experts = list(dict_expert_name_id[i] for i in list_id_experts_in_dict)
+
+        for j, expert_id in enumerate(list_id_experts_in_dict):
+            for i, (competence, data) in enumerate(self.dict_marks_requirement.items()):
+                expert_data = self.dict_marks_requirement[competence].get(expert_id)
+                if expert_data is None:
+                    mark = 0
+                else:
+                    mark = expert_data.get("mark") if competence != "Итого" else \
+                        self.dict_marks_requirement[competence].get(expert_id)
+            y.append(mark)
+                
+        # create pyqt5graph bar graph item
+        # with width = 0.6
+        # with bar colors = green
+        bargraph = pg.BarGraphItem(x = list_id_experts_in_dict, height = y, width = 0.3, brush ='g')
+        plot.addItem(bargraph)
+        return plot
+
 
     def clear_vbox(self):
         """ Очистить вкладку """

@@ -1,4 +1,4 @@
-create table experts(
+init_data = """ create table experts(
     expert_id integer not null primary key autoincrement,
     first_name varchar(255) not null,
     last_name varchar(255) not null
@@ -29,11 +29,6 @@ create table solutions(
     text varchar(255),
     valid_answer varchar(255) default null
 );
---         create table answers(
---             answer_id integer not null primary key autoincrement,
---             expert_id integer references experts ON DELETE CASCADE ON UPDATE CASCADE,
---             solution_id integer references answers ON DELETE CASCADE ON UPDATE CASCADE
---         );
 create table mark_requirement(
     mark_requirement_id integer not null primary key autoincrement,
     expert_id integer references experts ON DELETE CASCADE ON UPDATE CASCADE,
@@ -304,3 +299,4 @@ INSERT INTO  tasks (task_id, requirement_name, task_type, name, description) VAL
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (33, 2, "Высокие", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (33, 1, "Средние", "");
 INSERT INTO solutions (task_id, mark, text, valid_answer) VALUES (33, 0, "Низкий", "");
+"""
